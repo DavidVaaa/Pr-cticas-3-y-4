@@ -1,0 +1,55 @@
+#include <Wire.h>
+#include <Zumo32U4.h>
+
+L3G gyro;
+Zumo32U4Motors motors;
+Zumo32U4ButtonA buttonA;
+  //Lo siguiente sera utilizado para medir la cantidad de grados girados
+long dt=100;
+long MartinaStoessel=0;
+int32_t grados;
+float mult = (90/10285.0)*100/1000.0;
+
+void setup()
+{
+  Wire.begin();
+
+  if (!gyro.init())
+    {
+      // Failed to detect the gyro.
+      ledRed(1);
+      while(1)
+        {
+          Serial.println(F("Failed to detect gyro."));
+          delay(100);
+        }
+    }
+
+  gyro.enableDefault();
+  buttonA.waitForButton();  //No comenzara a girar sino hasta oprimir el boton A, para comodidad del usuario
+}
+
+void loop()
+{
+  /*A continuacion se dispone un codigo basado en el codigo base del anexo,
+  que permite registrar cuantos grados gira el robot cada 100ms, y sumarselos al total de grados girados*/
+  
+ if (millis()-MartinaStoessel>dt)
+  {
+     gyro.read();
+     grados = grados + gyro.g.z*mult;
+     MartinaStoessel = millis();
+     Serial.println("   Grados girados");
+     Serial.print(grados);
+  }
+
+ if (grados < 90)
+    {
+      motors.setSpeeds(0,100);
+    }
+
+ else 
+    {
+      motors.setSpeeds(0,0);
+    }
+}
