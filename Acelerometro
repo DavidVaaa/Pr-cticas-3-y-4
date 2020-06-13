@@ -1,0 +1,35 @@
+#include <Wire.h>
+#include <Zumo32U4.h>
+
+LSM303 compass;
+Zumo32U4Motors motors;
+
+long dt=50;
+long Violetta=0;
+int limMenor = 17300;    //Valor tomado experimentalmente
+int limMayor = 18900;    //Valor tomado experimentalmente
+
+
+void setup()
+{
+  Wire.begin();
+  compass.init();
+  compass.enableDefault();
+}
+
+void loop()
+{
+  if (millis()-Violetta>dt)
+    {
+       compass.read();
+
+      if (limMenor <= compass.a.z && limMayor <= compass.a.z)
+        {
+          motors.setSpeeds(200, 200);
+        }
+      else if ( compass.a.z < limMenor || compass.a.z > limMayor)
+        {
+          motors.setSpeeds(0,0);
+        }  
+    }
+}
