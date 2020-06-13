@@ -1,0 +1,40 @@
+/*1)  Lograr que el robot siga una línea recta de aprox 3 mts. 
+Al llegar al final de la línea el robot deberá girar 180 grados y volver a seguir la línea. */
+
+#include <Wire.h>
+#include <Zumo32U4.h>
+
+Zumo32U4Motors motors;
+Zumo32U4LineSensors lineSensors;
+Zumo32U4LCD lcd;
+Zumo32U4ButtonA buttonA;
+
+int16_t umbral = 1000;  //Se tomara como "negro" los valores mayores a dicha medida
+
+#define NUM_SENSORS 5
+unsigned int lineSensorValues[NUM_SENSORS];
+
+void setup() 
+{
+  lineSensors.initFiveSensors();
+
+  buttonA.waitForButton();
+}
+
+void loop() 
+{
+  lineSensors.read(lineSensorValues);
+
+  if (lineSensorValues[2] >= umbral)
+     {
+          motors.setSpeeds(200,200);
+          lcd.print(F("Linea detectada"));
+     }
+  
+  if (lineSensorValues[2] < umbral)
+     {
+       lcd.clear();
+       motors.setSpeeds(200,-200);
+       lcd.print(F("Eeeeeeeeehh"));
+     }
+}
