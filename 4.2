@@ -1,0 +1,48 @@
+/*2)  Lograr que el robot siga una línea que podrá presentar giros de 90 grados. 
+      En las figuras 5 y 6 se muestran los dos casos que deberá reconocer el robot.
+      Al llegar a cada esquina el robot puede detenerse y girar o girar mientras sigue avanzando.*/
+
+#include <Wire.h>
+#include <Zumo32U4.h>
+
+Zumo32U4Motors motors;
+Zumo32U4LineSensors lineSensors;
+Zumo32U4ButtonA buttonA;
+Zumo32U4LCD lcd;
+
+int16_t umbral = 1000;  //Se tomara como "negro" los valores mayores a dicha medida
+
+#define NUM_SENSORS 5
+unsigned int lineSensorValues[NUM_SENSORS];
+
+void setup()
+  {
+  lineSensors.initFiveSensors();
+}
+
+void loop()
+{
+  lineSensors.read(lineSensorValues);
+  
+  if (lineSensorValues[2] >= umbral)
+     {
+          motors.setSpeeds(200,200);
+          lcd.print(F("Linea detectada"));
+     }
+     
+  else if (lineSensorValues[2] < umbral)
+    {
+      if (lineSensorValues[4] >= umbral)
+        {
+          lcd.clear();
+          motors.setSpeeds(200,-200);
+          lcd.print(F("Girando derecha"));
+        }
+  
+      if (lineSensorValues[0] >= umbral)
+        {
+          lcd.clear();
+          motors.setSpeeds(-200,200);
+          lcd.print(F("Girando izquierda"));        }
+        }
+}
