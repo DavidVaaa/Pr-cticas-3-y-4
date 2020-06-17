@@ -45,7 +45,7 @@ void loop()
 
  if (grados < 90)
     {
-      motors.setSpeeds(0,100);
+      motors.setSpeeds(0,400);
     }
 
  else 
