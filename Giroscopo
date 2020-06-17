@@ -25,17 +25,20 @@ void setup()
         }
     }
 
-  gyro.enableDefault();
-  buttonA.waitForButton();  //No comenzara a girar sino hasta oprimir el boton A, para comodidad del usuario
+  gyro.enableDefault(); 
+  buttonA.waitForButton(); //No comenzara a girar sino hasta oprimir el boton A, para comodidad del usuario
 }
 
 void loop()
 {
+  
+ 
+
   /*A continuacion se dispone un codigo basado en el codigo base del anexo,
   que permite registrar cuantos grados gira el robot cada 100ms, y sumarselos al total de grados girados*/
   
  if (millis()-MartinaStoessel>dt)
-  {
+  {  
      gyro.read();
      grados = grados + gyro.g.z*mult;
      MartinaStoessel = millis();
@@ -45,11 +48,13 @@ void loop()
 
  if (grados < 90)
     {
-      motors.setSpeeds(0,400);
+      motors.setSpeeds(-200,200);
     }
 
  else 
     {
       motors.setSpeeds(0,0);
+      grados=0;
+      buttonA.waitForButton();
     }
 }
