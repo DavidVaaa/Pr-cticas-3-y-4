@@ -10,7 +10,7 @@ Zumo32U4LineSensors lineSensors;
 Zumo32U4ButtonA buttonA;
 Zumo32U4LCD lcd;
 
-int16_t umbral = 1000;  //Se tomara como "negro" los valores mayores a dicha medida
+int16_t umbral = 500;  //Se tomara como "negro" los valores mayores a dicha medida
 
 #define NUM_SENSORS 5
 unsigned int lineSensorValues[NUM_SENSORS];
@@ -18,7 +18,8 @@ unsigned int lineSensorValues[NUM_SENSORS];
 void setup()
   {
   lineSensors.initFiveSensors();
-}
+  buttonA.waitForButton();
+  }
 
 void loop()
 {
@@ -26,8 +27,8 @@ void loop()
   
   if (lineSensorValues[2] >= umbral)
      {
-          motors.setSpeeds(200,200);
-          lcd.print(F("Linea detectada"));
+          motors.setSpeeds(100,100);
+          lcd.print(F("Linea"));
      }
      
   else if (lineSensorValues[2] < umbral)
@@ -35,14 +36,14 @@ void loop()
       if (lineSensorValues[4] >= umbral)
         {
           lcd.clear();
-          motors.setSpeeds(200,-200);
-          lcd.print(F("Girando derecha"));
+          motors.setSpeeds(100,-100);
+          lcd.print(F("Right"));
         }
   
       if (lineSensorValues[0] >= umbral)
         {
           lcd.clear();
-          motors.setSpeeds(-200,200);
-          lcd.print(F("Girando izquierda"));        }
+          motors.setSpeeds(-100,100);
+          lcd.print(F("Left"));        }
         }
 }
