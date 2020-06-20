@@ -1,13 +1,3 @@
-/*3)  Lograr que el robot siga una línea que podrá presentar uno o más cruces 
- (en forma de cruz). 
- En cada cruce el robot deberá estimar la posición relativa de los objetos a 
- su alrededor y finalmente avanzar siguiendo el camino que se presente libre 
- de obstáculos. 
-En la figura 7 se muestra el cruce que debe reconocer el robot.
-
-**HAY QUE REVISAR COMO FUNCIONAN LOS SENSORES DE PROXIMIDAD**
-*/
-
 #include <Wire.h>
 #include <Zumo32U4.h>
 
@@ -15,44 +5,64 @@ Zumo32U4LCD lcd;
 Zumo32U4LineSensors lineSensors;
 Zumo32U4ProximitySensors proxSensors;
 Zumo32U4Motors motors;
+Zumo32U4ButtonA buttonA;
 
-int16_t umbral = 1000;
+
+int16_t umbral = 700;
 
 #define NUM_SENSORS 5
 unsigned int lineSensorValues[NUM_SENSORS];
 
 void setup()
 {
+  lcd.clear();
   lineSensors.initFiveSensors();
   proxSensors.initThreeSensors();
+  buttonA.waitForButton();
 }
 
 void loop()
 {
   lineSensors.read(lineSensorValues);
 
-  motors.setSpeeds(200,200);
-
-  if (lineSensorValues[0] >= umbral && lineSensorValues[2] >= umbral && lineSensorValues[4] >= umbral)
+  if (lineSensorValues[0] < umbral && lineSensorValues[2] >= umbral && lineSensorValues[4] < umbral)
+     {
+          motors.setSpeeds(100,100);
+          lcd.print(F("Linea"));
+     }
+  
+  else if (lineSensorValues[0] >= umbral && lineSensorValues[2] >= umbral && lineSensorValues[4] >= umbral)
     {
        proxSensors.read();
-       int16_t izq = min (proxSensors.countsLeftWithLeftLeds(), proxSensors.countsLeftWithRightLeds());
-       int16_t der = min (proxSensors.countsRightWithLeftLeds(), proxSensors.countsRightWithRightLeds());
-       int16_t ade = min (proxSensors.countsFrontWithLeftLeds(), proxSensors.countsFrontWithRightLeds());
+       int16_t izq = max (proxSensors.countsLeftWithLeftLeds(), proxSensors.countsLeftWithRightLeds());
+       int16_t der = max (proxSensors.countsRightWithLeftLeds(), proxSensors.countsRightWithRightLeds());
+       int16_t ade = max (proxSensors.countsFrontWithLeftLeds(), proxSensors.countsFrontWithRightLeds());
 
-       if (izq > der && izq > ade)
+       if (izq < der && izq < ade)
         {
-          motors.setSpeeds(-200, 200);
+          motors.setSpeeds(-100, 200);
+         if (lineSensorValues[2] < umbral)
+           {
+             motors.setSpeeds(-100, 200);
+             lcd.clear();
+             lcd.print(F("Eeehh"));
+           }
         }
 
-       if (der > izq && der > ade)
+       if (der < izq && der < ade)
         {
-          motors.setSpeeds(200, -200);
+          motors.setSpeeds(200, -100);
+          if (lineSensorValues[2] < umbral)
+             {
+               motors.setSpeeds(200, -100);
+               lcd.clear();
+               lcd.print(F("Eeehh"));
+             }          
         }
 
-       if (ade > der && ade > izq)
+       if (ade < der && ade < izq)
         {
-          motors.setSpeeds(200, 200);
+          motors.setSpeeds(100, 100);
         }        
     }
 }
